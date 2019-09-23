@@ -41,6 +41,8 @@ import (
 	"net/http"
 	"sync"
 	"time"
+        _ "github.com/go-sql-driver/mysql"
+        "database/sql"
 )
 
 // Command-line flags.
@@ -58,6 +60,18 @@ func main() {
 	http.Handle("/", NewServer(*version, changeURL, *pollPeriod))
 	log.Fatal(http.ListenAndServe(*httpAddr, nil))
 
+        cnn, err := sql.Open("mysql", "docker:docker@tcp(db:5000)/test_db")
+        if err != nil {
+                log.Fatal(err)
+        }
+
+        id := 1
+        var name string
+
+        if err := cnn.QueryRow("SELECT name FROM test_tb WHERE id = ? LIMIT 1", id).Scan(&name); err != nil {
+                log.Fatal(err)
+        }
+        fmt.Println(id, name)
 }
 
 // Exported variables for monitoring the server.
@@ -145,8 +159,9 @@ var tmpl = template.Must(template.New("tmpl").Parse(`
 <!DOCTYPE html><html><body><center>
 	<h2>Is Go {{.Version}} out yet?</h2>
 	<h1>
+  {{.name}}
 	{{if .Yes}}
-		<a href="{{.URL}}">YES!</a>
+		<a href="{{.URL}}">YE!</a>
 	{{else}}
 		No. :-(
 	{{end}}
