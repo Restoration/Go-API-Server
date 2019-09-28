@@ -1,12 +1,23 @@
 version: '3'
-# Define services
 services:
-  # App Service
+  db:
+    image: mysql:5.7
+    ports:
+      - "5000:3306"
+    container_name: golang_db
+    volumes:
+      - ./db/mysql_init:/docker-entrypoint-initdb.d
+      - ./db/mysql_data:/var/lib/mysql
+    environment:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_USER: test
+        MYSQL_PASSWORD: test
   app:
-    # Configuration for building the docker image for the service
     build:
-      context: . # Use an image built from the specified dockerfile in the current directory.
+      context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:8080" # Forward the exposed port 8080 on the container to port 8080 on the host machine
+      - "8080:8080"
     restart: unless-stopped
+    links:
+      - db
