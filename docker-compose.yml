@@ -2,18 +2,16 @@ version: '3'
 services:
   db:
     image: mysql:5.7
-    volumes:
-      - ./db/mysql_init:/init.sql
-      - ./db/mysql_data:/var/lib/mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: test_db
-      MYSQL_USER: docker
-      MYSQL_PASSWORD: docker
-    container_name: golang_db
     ports:
       - "5000:3306"
-    tty: true
+    container_name: golang_db
+    volumes:
+      - ./db/mysql_init:/docker-entrypoint-initdb.d
+      - ./db/mysql_data:/var/lib/mysql
+    environment:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_USER: test
+        MYSQL_PASSWORD: test
   app:
     build:
       context: .
@@ -21,5 +19,5 @@ services:
     ports:
       - "8080:8080"
     restart: unless-stopped
-    depends_on:
+    links:
       - db

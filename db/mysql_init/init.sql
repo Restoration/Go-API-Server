@@ -1,4 +1,5 @@
-Use dtb_todo;
+create database sample;
+use sample;
 
 Create table `todo` (id int, name varchar(20));
 
